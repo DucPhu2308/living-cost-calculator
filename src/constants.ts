@@ -1,0 +1,1 @@
+export const jwtSecret = 'temp_secret';

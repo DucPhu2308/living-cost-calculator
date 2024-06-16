@@ -4,12 +4,13 @@ import { UserController } from './user.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { JwtModule } from '@nestjs/jwt';
+import { jwtSecret } from 'src/constants';
 
 @Module({
   imports: [MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
             JwtModule.register({
               global: true,
-              secret: 'temp_secret',
+              secret: jwtSecret,
               signOptions: { expiresIn: '7d' },
             })],
   controllers: [UserController],

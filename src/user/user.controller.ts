@@ -1,7 +1,8 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards, Request } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
+import { AuthGuard } from './auth.guard';
 
 @Controller('api/user')
 export class UserController {
@@ -21,5 +22,11 @@ export class UserController {
     @Get('find')
     find(@Query('q') q: string) {
         return this.userService.find(q);
+    }
+
+    @Get('profile')
+    @UseGuards(AuthGuard)
+    getProfile(@Request() req) {
+        return req.user;
     }
 }
