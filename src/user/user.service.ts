@@ -53,4 +53,8 @@ export class UserService {
 
         return { token: accessToken };
     }
+
+    async find(q: string) {
+        return this.userModel.find({ $or: [{ username: new RegExp(q, 'i') }, { email: new RegExp(q, 'i') }] });
+    }
 }

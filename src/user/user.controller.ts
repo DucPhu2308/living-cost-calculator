@@ -1,9 +1,9 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
 
-@Controller('user')
+@Controller('api/user')
 export class UserController {
     constructor(private readonly userService: UserService) { }
 
@@ -16,5 +16,10 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     login(@Body() loginDto: LoginDto) {
         return this.userService.login(loginDto);
+    }
+
+    @Get('find')
+    find(@Query('q') q: string) {
+        return this.userService.find(q);
     }
 }
