@@ -1,32 +1,39 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Group } from 'src/schemas/group.schema';
 import { CreateGroupDto } from './dtos/create-group.dto';
 import { AddUserDto } from './dtos/add-user.dto';
 import { create } from 'domain';
+import { User } from 'src/schemas/user.schema';
 
 @Injectable()
 export class GroupService {
     async removeUser(removeUserDto: AddUserDto) {
-        const group = await this.groupModel.findById(removeUserDto.groupId);
+        const group = await this.groupModel.findById(new Types.ObjectId(removeUserDto.groupId));
         if (!group) {
             throw new HttpException('Group not found', 404);
         }
-        group.users = group.users.filter(userId => !removeUserDto.userIds.includes(userId));
+        group.users = group.users.filter(
+            userId => !removeUserDto.userIds.includes(userId.toString())
+        );
         return group.save();
     }
     
-    constructor(@InjectModel(Group.name) private groupModel: Model<Group>) { }
+    constructor(
+        @InjectModel(Group.name) private groupModel: Model<Group>,
+        @InjectModel(User.name) private userModel: Model<User>
+    ) { }
     async createGroup(createGroupDto: CreateGroupDto) {
         // check if user exists
         for (const userId of createGroupDto.users) {
-            const user = await this.groupModel.findOne({ _id: userId });
+            console.log(typeof userId);
+            const user = await this.userModel.findOne({ _id: userId});
             if (!user) {
                 throw new HttpException('User not found', 404);
             }
         }
-        const checkCreator = await this.groupModel.findOne({ _id: createGroupDto.creator });
+        const checkCreator = await this.userModel.findOne({ _id: createGroupDto.creator});
         if (!checkCreator) {
             throw new HttpException('Creator not found', 404);
         }
@@ -34,22 +41,19 @@ export class GroupService {
         return group.save();
     }
     async addUser(addUserDto: AddUserDto) {
-        const group = await this.groupModel.findById(addUserDto.groupId);
+        const group = await this.groupModel.findOne({ _id: new Types.ObjectId(addUserDto.groupId) });
         if (!group) {
             throw new HttpException('Group not found', 404);
         }
+        
         for (const userId of addUserDto.userIds) {
-            // check if user exists and not already in the group
-            const user = await this.groupModel.findOne({ _id: userId });
+            const user: User = await this.userModel.findOne({ _id: new Types.ObjectId(userId) });
             if (!user) {
                 throw new HttpException('User not found', 404);
             }
-            if (group.users.includes(userId)) {
-                throw new HttpException('User already in the group', 400);
-            }
-
-            group.users.push(userId);
+            group.users.push(user._id);
         }
+
         return group.save();
     }
 }

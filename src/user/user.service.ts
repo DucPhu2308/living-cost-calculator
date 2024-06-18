@@ -1,4 +1,4 @@
-import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
+import { HttpException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
@@ -14,12 +14,12 @@ export class UserService {
         // check unique for email and username
         const emailExist = await this.userModel.findOne({ email: registerDto.email });
         if (emailExist) {
-            throw new Error('Email already exists');
+            throw new HttpException('Email already exists', 400);
         }
 
         const usernameExist = await this.userModel.findOne({ username: registerDto.username });
         if (usernameExist) {
-            throw new Error('Username already exists');
+            throw new HttpException('Username already exists', 400);
         }
 
         const salt = bcrypt.genSaltSync(10);

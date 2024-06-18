@@ -1,18 +1,23 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { HydratedDocument, Types } from "mongoose";
+import { User } from "./user.schema";
+import { Group } from "./group.schema";
 
 @Schema()
 export class Expense {
+    @Prop({ type: Types.ObjectId, default: new Types.ObjectId() })
+    _id: string;
+
     @Prop()
     name: string;
 
     @Prop()
     cost: number;
 
-    @Prop({type: Types.ObjectId, ref: 'User'})
+    @Prop()
     creator: string;
 
-    @Prop({type: Types.ObjectId, ref: 'Group'})
+    @Prop()
     group: string;
 
     @Prop()

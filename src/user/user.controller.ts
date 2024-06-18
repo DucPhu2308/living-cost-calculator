@@ -9,6 +9,7 @@ export class UserController {
     constructor(private readonly userService: UserService) { }
 
     @Post('register')
+    @HttpCode(HttpStatus.OK)
     register(@Body() registerDto: RegisterDto) {
         return this.userService.register(registerDto);
     }
