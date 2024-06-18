@@ -5,7 +5,7 @@ import { Expense } from "./expense.schema";
 
 @Schema()
 export class Group {
-    @Prop({ type: Types.ObjectId, default: new Types.ObjectId() })
+    @Prop({ type: Types.ObjectId, default: () => new Types.ObjectId() })
     _id: string;
 
     @Prop()

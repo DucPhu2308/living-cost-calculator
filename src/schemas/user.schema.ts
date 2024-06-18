@@ -5,7 +5,7 @@ import { Group } from "./group.schema";
 
 @Schema()
 export class User {
-    @Prop({ type: Types.ObjectId, default: new Types.ObjectId()})
+    @Prop({ type: Types.ObjectId, default:() => new Types.ObjectId()})
     _id: string;
     @Prop({ unique: true })
     email: string;
