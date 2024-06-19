@@ -6,12 +6,14 @@ import { Mongoose } from 'mongoose';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { GroupModule } from './group/group.module';
+import { ExpenseModule } from './expense/expense.module';
 
 @Module({
   imports: [UserModule, 
     ConfigModule.forRoot(),
     MongooseModule.forRoot(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_NAME}?retryWrites=true&w=majority`),
-    GroupModule],
+    GroupModule,
+    ExpenseModule],
   controllers: [AppController],
   providers: [AppService],
 })

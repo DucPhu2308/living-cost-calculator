@@ -56,4 +56,8 @@ export class GroupService {
 
         return group.save();
     }
+
+    async getGroupsByUserId(userId: string) {
+        return await this.groupModel.find({ users: new Types.ObjectId(userId)});
+    }
 }
