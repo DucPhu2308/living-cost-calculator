@@ -10,6 +10,11 @@ import { LoginDto } from './dtos/login.dto';
 @Injectable()
 export class UserService {
     constructor(@InjectModel(User.name) private userModel: Model<User>, private jwtService: JwtService) { }
+
+    async findByUsername(username: string) {
+        return await this.userModel.findOne({ username });
+    }
+
     async register(registerDto: RegisterDto) {
         // check unique for email and username
         const emailExist = await this.userModel.findOne({ email: registerDto.email });

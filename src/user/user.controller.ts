@@ -25,6 +25,11 @@ export class UserController {
         return this.userService.find(q);
     }
 
+    @Get('find-by-username')
+    findByUsername(@Query('q') q: string) {
+        return this.userService.findByUsername(q);
+    }
+
     @Get('profile')
     @UseGuards(AuthGuard)
     getProfile(@Request() req) {
