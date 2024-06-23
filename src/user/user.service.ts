@@ -1,7 +1,7 @@
 import { HttpException, Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dtos/register.dto';
 import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
@@ -61,5 +61,9 @@ export class UserService {
 
     async find(q: string) {
         return this.userModel.find({ $or: [{ username: new RegExp(q, 'i') }, { email: new RegExp(q, 'i') }] });
+    }
+
+    async getUserById(userId: string) {
+        return this.userModel.findById(new Types.ObjectId(userId));
     }
 }

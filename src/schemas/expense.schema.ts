@@ -14,17 +14,17 @@ export class Expense {
     @Prop()
     cost: number;
 
-    @Prop()
+    @Prop({ type: Types.ObjectId, ref: 'User'})
     creator: string;
 
-    @Prop()
+    @Prop([{ type: Types.ObjectId, ref: 'User' }])
+    shared_with: string[];
+
+    @Prop({ type: Types.ObjectId, ref: 'Group'})
     group: string;
 
     @Prop()
     created_date: Date;
-
-    @Prop()
-    deleted_date: Date;
 
     @Prop()
     done_date: Date;

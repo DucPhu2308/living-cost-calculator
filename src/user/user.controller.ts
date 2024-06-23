@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards, Request } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, UseGuards, Request, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { RegisterDto } from './dtos/register.dto';
 import { LoginDto } from './dtos/login.dto';
@@ -34,5 +34,10 @@ export class UserController {
     @UseGuards(AuthGuard)
     getProfile(@Request() req) {
         return req.user;
+    }
+
+    @Get(':userId')
+    getUserById(@Param('userId') userId: string){
+        return this.userService.getUserById(userId);
     }
 }

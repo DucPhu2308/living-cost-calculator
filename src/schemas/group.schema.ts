@@ -11,10 +11,10 @@ export class Group {
     @Prop()
     name: string;
 
-    @Prop()
+    @Prop({ type: Types.ObjectId, ref: 'User' })
     creator: string;
 
-    @Prop()
+    @Prop([{ type: Types.ObjectId, ref: 'User' }])
     users: string[];
 }
 

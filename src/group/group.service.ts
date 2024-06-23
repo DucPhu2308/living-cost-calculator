@@ -60,4 +60,12 @@ export class GroupService {
     async getGroupsByUserId(userId: string) {
         return await this.groupModel.find({ users: new Types.ObjectId(userId)});
     }
+
+    async deleteGroupById(groupId: string) {
+        try {
+            await this.groupModel.deleteOne({ _id: groupId });
+        } catch (err) {
+            throw new HttpException('Error: ' + err, 500);
+        }
+    }
 }
