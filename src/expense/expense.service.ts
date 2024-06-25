@@ -6,14 +6,52 @@ import { CreateExpenseDto } from './dtos/create-expense.dto';
 import { Group } from 'src/schemas/group.schema';
 import { User } from 'src/schemas/user.schema';
 import { UpdateExpenseDto } from './dtos/update-expense.dto';
+import { AddUserToExpenseDto } from './dtos/add-user-to-expense.dto';
 
 @Injectable()
 export class ExpenseService {
+    
     constructor(
         @InjectModel(Expense.name) private expenseModel: Model<Expense>,
         @InjectModel(Group.name) private groupModel: Model<Group>,
         @InjectModel(User.name) private userModel: Model<User>,
     ) { }
+
+    async addUserToExpense(addUserToExpenseDto: AddUserToExpenseDto) {
+        const { expenseId, userIds } = addUserToExpenseDto;
+        const expense = await this.expenseModel.findById(new Types.ObjectId(expenseId));
+        if (!expense) {
+            throw new HttpException('Expense not found', 404);
+        }
+
+        for (const userId of userIds) {
+            const user = this.userModel.findById(new Types.ObjectId(userId));
+            if (!user) {
+                throw new HttpException('User not found', 404);
+            }
+
+            // check if the user is already in the shared_with list
+            const sharedWithIndex = expense.shared_with.findIndex(id => id.toString() === userId);
+            if (sharedWithIndex === -1) { // user is not in the shared_with list
+                expense.shared_with.push(userId);
+            }
+        }
+
+        return expense.save();
+    }
+
+    async removeUserFromExpense(removeUserFromExpenseDto: AddUserToExpenseDto) {
+        const { expenseId, userIds } = removeUserFromExpenseDto;
+        const expense = await this.expenseModel.findById(new Types.ObjectId(expenseId));
+        if (!expense) {
+            throw new HttpException('Expense not found', 404);
+        }
+
+        expense.shared_with = expense.shared_with.filter(id => !userIds.includes(id.toString()));
+
+        return expense.save();
+
+    }
 
     async createExpense(expense: CreateExpenseDto) {
         const newExpense = new this.expenseModel(expense);

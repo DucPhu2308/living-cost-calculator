@@ -3,6 +3,7 @@ import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dtos/create-expense.dto';
 import { UpdateExpenseDto } from './dtos/update-expense.dto';
 import { AuthGuard } from 'src/user/auth.guard';
+import { AddUserToExpenseDto } from './dtos/add-user-to-expense.dto';
 
 @Controller('api/expense')
 export class ExpenseController {
@@ -33,6 +34,16 @@ export class ExpenseController {
     deleteExpense(@Param("expenseId") expenseId: string, @Request() req) {
         const actorId = req.user.sub;
         return this.expenseService.deleteExpense(expenseId, actorId);
+    }
+
+    @Put('add-user') // chua test
+    addUserToExpense(@Body() addUserToExpenseDto: AddUserToExpenseDto) {
+        return this.expenseService.addUserToExpense(addUserToExpenseDto);        
+    }
+
+    @Put('remove-user') // chua test
+    removeUserFromExpense(@Body() addUserToExpenseDto: AddUserToExpenseDto) {
+        return this.expenseService.removeUserFromExpense(addUserToExpenseDto);
     }
 
 }

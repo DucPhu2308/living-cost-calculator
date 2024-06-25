@@ -51,7 +51,12 @@ export class GroupService {
             if (!user) {
                 throw new HttpException('User not found', 404);
             }
-            group.users.push(user._id);
+
+            // check if the user is already in the group
+            const userIndex = group.users.findIndex(id => id.toString() === userId);
+            if (userIndex === -1) {
+                group.users.push(userId);
+            }
         }
 
         return group.save();
@@ -61,9 +66,20 @@ export class GroupService {
         return await this.groupModel.find({ users: new Types.ObjectId(userId)});
     }
 
-    async deleteGroupById(groupId: string) {
+    async deleteGroupById(groupId: string, actorId: string) {
+        // only creator can delete group
+        const group = await this.groupModel.findOne({ _id: new Types.ObjectId(groupId) });
+        if (!group) {
+            throw new HttpException('Group not found', 404);
+        }
+
+        if (group.creator.toString() !== actorId) {
+            throw new HttpException('Unauthorized', 401);
+        }
+
         try {
-            await this.groupModel.deleteOne({ _id: groupId });
+            await this.groupModel.deleteOne({ _id: new Types.ObjectId(groupId)});
+            return 'Group deleted successfully';
         } catch (err) {
             throw new HttpException('Error: ' + err, 500);
         }

@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { GroupService } from './group.service';
 import { CreateGroupDto } from './dtos/create-group.dto';
 import { AddUserDto } from './dtos/add-user.dto';
+import { AuthGuard } from 'src/user/auth.guard';
 
 @Controller('api/group')
 export class GroupController {
@@ -25,6 +26,13 @@ export class GroupController {
     @Get('user/:userId')
     getGroupsByUserId(@Param('userId') userId: string) {
         return this.groupService.getGroupsByUserId(userId);
+    }
+
+    @Delete(':groupId')
+    @UseGuards(AuthGuard)
+    deleteGroup(@Param('groupId') groupId: string, @Req() req){
+        const actorId = req.user.sub;
+        return this.groupService.deleteGroupById(groupId, actorId);
     }
 
 }
