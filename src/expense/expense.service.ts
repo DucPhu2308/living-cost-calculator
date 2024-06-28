@@ -1,12 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Expense } from 'src/schemas/expense.schema';
+import { Expense, ExpenseDocument } from 'src/schemas/expense.schema';
 import { CreateExpenseDto } from './dtos/create-expense.dto';
 import { Group } from 'src/schemas/group.schema';
 import { User } from 'src/schemas/user.schema';
 import { UpdateExpenseDto } from './dtos/update-expense.dto';
 import { AddUserToExpenseDto } from './dtos/add-user-to-expense.dto';
+import { ExpenseResponse } from './responses/expense-response';
 
 @Injectable()
 export class ExpenseService {
@@ -25,15 +26,15 @@ export class ExpenseService {
         }
 
         for (const userId of userIds) {
-            const user = this.userModel.findById(new Types.ObjectId(userId));
+            const user = await this.userModel.findById(new Types.ObjectId(userId));
             if (!user) {
                 throw new HttpException('User not found', 404);
             }
 
             // check if the user is already in the shared_with list
-            const sharedWithIndex = expense.shared_with.findIndex(id => id.toString() === userId);
+            const sharedWithIndex = expense.shared_with.findIndex(id => id.toString() === userId.toString());
             if (sharedWithIndex === -1) { // user is not in the shared_with list
-                expense.shared_with.push(userId);
+                expense.shared_with.push(new Types.ObjectId(userId));
             }
         }
 
@@ -57,6 +58,18 @@ export class ExpenseService {
         const newExpense = new this.expenseModel(expense);
         newExpense.created_date = new Date();
 
+        // check existence of group
+        const group = await this.groupModel.findById(new Types.ObjectId(expense.group));
+        if (!group) {
+            throw new HttpException('Group not found', 404);
+        }
+
+        // check existence of creator
+        const creator = await this.userModel.findById(new Types.ObjectId(expense.creator));
+        if (!creator) {
+            throw new HttpException('Creator not found', 404);
+        }
+
         // check existence of members shared_with this expense
         for (const userId of expense.shared_with) {
             const user = await this.userModel.findById(userId);
@@ -69,7 +82,12 @@ export class ExpenseService {
     }
 
     async getExpensesByGroupId(groupId: string) {
-        return await this.expenseModel.find({ group: groupId });
+        const expenses = await this.expenseModel.find({ group: new Types.ObjectId(groupId) })
+            .populate('creator', '_id username email')
+            .populate('shared_with', '_id username email')
+            .exec();
+        
+        return expenses; 
     }
 
     async getExpenseById(expenseId: string) {

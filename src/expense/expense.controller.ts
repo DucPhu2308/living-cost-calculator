@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
 import { CreateExpenseDto } from './dtos/create-expense.dto';
 import { UpdateExpenseDto } from './dtos/update-expense.dto';
@@ -36,12 +36,12 @@ export class ExpenseController {
         return this.expenseService.deleteExpense(expenseId, actorId);
     }
 
-    @Put('add-user') // chua test
+    @Patch('add-user') // chua test
     addUserToExpense(@Body() addUserToExpenseDto: AddUserToExpenseDto) {
         return this.expenseService.addUserToExpense(addUserToExpenseDto);        
     }
 
-    @Put('remove-user') // chua test
+    @Patch('remove-user') // chua test
     removeUserFromExpense(@Body() addUserToExpenseDto: AddUserToExpenseDto) {
         return this.expenseService.removeUserFromExpense(addUserToExpenseDto);
     }
